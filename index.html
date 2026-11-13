@@ -3,67 +3,128 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>실시간 밸런스 게임</title>
+  <title>실시간 밸런스 게임 & 토론</title>
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
     body {
       font-family: -apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo", sans-serif;
       background: #1a1d24; color: #ffffff;
-      display: flex; justify-content: center; align-items: center;
-      min-height: 100vh; padding: 1rem;
+      display: flex; justify-content: center; align-items: flex-start;
+      min-height: 100vh; padding: 2rem 1rem;
     }
-    .card {
-      background: #252932; width: 100%; max-width: 480px;
-      padding: 2rem; border-radius: 16px;
-      box-shadow: 0 10px 30px rgba(0,0,0,0.3); text-align: center;
+    .container {
+      background: #252932; width: 100%; max-width: 520px;
+      padding: 1.8rem; border-radius: 16px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.35);
     }
-    h1 { font-size: 1.5rem; margin-bottom: 0.5rem; }
-    p.sub { color: #9ca3af; font-size: 0.9rem; margin-bottom: 1.8rem; }
-    .btn-group { display: flex; flex-direction: column; gap: 1rem; margin-bottom: 1.8rem; }
-    button {
-      padding: 1.1rem; font-size: 1.05rem; font-weight: 700;
+    header { text-align: center; margin-bottom: 1.2rem; }
+    header h1 { font-size: 1.45rem; margin-bottom: 0.3rem; }
+    header p { color: #9ca3af; font-size: 0.85rem; }
+
+    /* 주제 선택 탭 */
+    .tabs { display: flex; gap: 0.5rem; margin-bottom: 1.5rem; }
+    .tab-btn {
+      flex: 1; padding: 0.6rem; font-size: 0.85rem; font-weight: 600;
+      background: #1a1d24; color: #9ca3af; border: 1px solid #374151;
+      border-radius: 8px; cursor: pointer; transition: 0.2s;
+    }
+    .tab-btn.active { background: #4a7cff; color: #fff; border-color: #4a7cff; }
+
+    .question-title {
+      text-align: center; font-size: 1.15rem; font-weight: 700;
+      margin-bottom: 1.2rem; color: #f3f4f6;
+    }
+    .btn-group { display: flex; flex-direction: column; gap: 0.75rem; margin-bottom: 1.4rem; }
+    .vote-btn {
+      padding: 1rem; font-size: 1rem; font-weight: 700;
       border: none; border-radius: 12px; cursor: pointer;
-      transition: transform 0.15s, opacity 0.2s; color: #fff;
+      transition: transform 0.12s; color: #fff;
     }
-    button:active { transform: scale(0.98); }
+    .vote-btn:active { transform: scale(0.98); }
     .btn-a { background: #4a7cff; }
     .btn-b { background: #ff5a5f; }
-    .result-box { background: #1a1d24; padding: 1.2rem; border-radius: 12px; }
+
+    .result-box {
+      background: #1a1d24; padding: 1.1rem; border-radius: 12px;
+      margin-bottom: 1.5rem;
+    }
+    .stats { display: flex; justify-content: space-between; font-size: 0.88rem; font-weight: 600; }
     .bar-wrap {
-      display: flex; height: 24px; border-radius: 12px;
-      overflow: hidden; background: #374151; margin: 0.8rem 0;
+      display: flex; height: 20px; border-radius: 10px;
+      overflow: hidden; background: #374151; margin: 0.7rem 0;
     }
     .bar-a { background: #4a7cff; width: 50%; transition: width 0.4s ease; }
     .bar-b { background: #ff5a5f; width: 50%; transition: width 0.4s ease; }
-    .stats { display: flex; justify-content: space-between; font-size: 0.9rem; font-weight: 600; }
+
+    /* 실시간 한줄 의견 */
+    .comment-section h3 { font-size: 0.95rem; margin-bottom: 0.7rem; color: #e5e7eb; }
+    .comment-form { display: flex; gap: 0.5rem; margin-bottom: 1rem; }
+    .comment-form input {
+      flex: 1; padding: 0.65rem 0.85rem; border-radius: 8px;
+      border: 1px solid #374151; background: #1a1d24; color: #fff;
+      font-size: 0.9rem; outline: none;
+    }
+    .comment-form input:focus { border-color: #4a7cff; }
+    .comment-form button {
+      padding: 0 1rem; background: #4a7cff; color: #fff;
+      border: none; border-radius: 8px; font-weight: 600; cursor: pointer;
+    }
+    .comment-list {
+      display: flex; flex-direction: column; gap: 0.5rem;
+      max-height: 180px; overflow-y: auto;
+    }
+    .comment-item {
+      background: #1a1d24; padding: 0.65rem 0.9rem; border-radius: 8px;
+      font-size: 0.88rem; display: flex; justify-content: space-between;
+    }
+    .comment-time { color: #6b7280; font-size: 0.75rem; margin-left: 0.5rem; white-space: nowrap; }
   </style>
 </head>
 <body>
-  <div class="card">
-    <h1>🔥 오늘의 밸런스 게임</h1>
-    <p class="sub">평생 한 가지만 선택해야 한다면?</p>
+  <div class="container">
+    <header>
+      <h1>🔥 실시간 밸런스 게임</h1>
+      <p>투표하고 실시간 한줄 의견도 남겨보세요!</p>
+    </header>
+
+    <div class="tabs">
+      <button class="tab-btn active" data-topic="q1">1라운드: 음식</button>
+      <button class="tab-btn" data-topic="q2">2라운드: 직장</button>
+      <button class="tab-btn" data-topic="q3">3라운드: 초능력</button>
+    </div>
+
+    <div class="question-title" id="q-title">평생 한 가지만 포기해야 한다면?</div>
 
     <div class="btn-group">
-      <button class="btn-a" id="vote-a">평생 탄산음료 안 마시기 🥤</button>
-      <button class="btn-b" id="vote-b">평생 라면 안 먹기 🍜</button>
+      <button class="vote-btn btn-a" id="vote-a">평생 탄산음료 안 마시기 🥤</button>
+      <button class="vote-btn btn-b" id="vote-b">평생 라면 안 먹기 🍜</button>
     </div>
 
     <div class="result-box">
       <div class="stats">
-        <span id="text-a" style="color:#7aa2ff;">탄산 포기: 0표 (50%)</span>
-        <span id="text-b" style="color:#ff8589;">라면 포기: 0표 (50%)</span>
+        <span id="text-a" style="color:#7aa2ff;">A: 0표 (50%)</span>
+        <span id="text-b" style="color:#ff8589;">B: 0표 (50%)</span>
       </div>
       <div class="bar-wrap">
         <div class="bar-a" id="bar-a"></div>
         <div class="bar-b" id="bar-b"></div>
       </div>
-      <p id="total-text" style="font-size:0.8rem; color:#9ca3af;">총 0명 참여 중</p>
+      <p id="total-text" style="text-align:center; font-size:0.8rem; color:#9ca3af;">총 0명 실시간 참여 중</p>
+    </div>
+
+    <div class="comment-section">
+      <h3>💬 실시간 한줄 토론</h3>
+      <form class="comment-form" id="comment-form">
+        <input type="text" id="comment-input" placeholder="선택 이유를 짧게 남겨보세요..." maxlength="60" required />
+        <button type="submit">등록</button>
+      </form>
+      <div class="comment-list" id="comment-list"></div>
     </div>
   </div>
 
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js";
-    import { getDatabase, ref, runTransaction, onValue } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-database.js";
+    import { getDatabase, ref, runTransaction, onValue, push, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-database.js";
 
     const firebaseConfig = {
       apiKey: "AIzaSyDR1u7z3e7qjVMpERFk2xgNDjy5h_MatiM",
@@ -77,9 +138,95 @@
 
     const app = initializeApp(firebaseConfig);
     const db = getDatabase(app);
-    const votesRef = ref(db, "votes");
+
+    const topics = {
+      q1: {
+        title: "평생 한 가지만 포기해야 한다면?",
+        a: "평생 탄산음료 안 마시기 🥤",
+        b: "평생 라면 안 먹기 🍜",
+        labelA: "탄산 포기",
+        labelB: "라면 포기"
+      },
+      q2: {
+        title: "더 견디기 힘든 상황은?",
+        a: "일 없는데 정시퇴근 눈치 주는 상사 👀",
+        b: "칼퇴 보장되지만 업무량 2배 폭탄 💻",
+        labelA: "눈치 상사",
+        labelB: "업무 폭탄"
+      },
+      q3: {
+        title: "하나만 가질 수 있다면?",
+        a: "10년 전으로 돌아가기 ⏪",
+        b: "지금 당장 10억 받기 💰",
+        labelA: "10년 전",
+        labelB: "지금 10억"
+      }
+    };
+
+    let currentTopic = "q1";
+    let unsubscribeVotes = null;
+    let unsubscribeComments = null;
+
+    function loadTopic(topicKey) {
+      currentTopic = topicKey;
+      const t = topics[topicKey];
+      document.getElementById("q-title").innerText = t.title;
+      document.getElementById("vote-a").innerText = t.a;
+      document.getElementById("vote-b").innerText = t.b;
+
+      if (unsubscribeVotes) unsubscribeVotes();
+      if (unsubscribeComments) unsubscribeComments();
+
+      const votesRef = ref(db, `topics/${topicKey}/votes`);
+      unsubscribeVotes = onValue(votesRef, (snapshot) => {
+        const data = snapshot.val() || { a: 0, b: 0 };
+        const countA = data.a || 0;
+        const countB = data.b || 0;
+        const total = countA + countB;
+
+        const pctA = total === 0 ? 50 : Math.round((countA / total) * 100);
+        const pctB = total === 0 ? 50 : 100 - pctA;
+
+        document.getElementById("bar-a").style.width = pctA + "%";
+        document.getElementById("bar-b").style.width = pctB + "%";
+        document.getElementById("text-a").innerText = `${t.labelA}: ${countA}표 (${pctA}%)`;
+        document.getElementById("text-b").innerText = `${t.labelB}: ${countB}표 (${pctB}%)`;
+        document.getElementById("total-text").innerText = `총 ${total}명 실시간 참여 중`;
+      });
+
+      const commentsRef = ref(db, `topics/${topicKey}/comments`);
+      unsubscribeComments = onValue(commentsRef, (snapshot) => {
+        const listEl = document.getElementById("comment-list");
+        listEl.innerHTML = "";
+        const items = [];
+        snapshot.forEach((child) => items.push(child.val()));
+        items.reverse().forEach((item) => {
+          const div = document.createElement("div");
+          div.className = "comment-item";
+          const timeStr = item.time ? new Date(item.time).toLocaleTimeString("ko-KR", { hour: "2-digit", minute: "2-digit" }) : "방금";
+          div.innerHTML = `<span>${escapeHTML(item.text)}</span><span class="comment-time">${timeStr}</span>`;
+          listEl.appendChild(div);
+        });
+      });
+    }
+
+    function escapeHTML(str) {
+      return str.replace(/[&<>'"]/g, tag => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' }[tag]));
+    }
+
+    document.querySelectorAll(".tab-btn").forEach((btn) => {
+      btn.addEventListener("click", () => {
+        document.querySelectorAll(".tab-btn").forEach(b => b.classList.remove("active"));
+        btn.classList.add("active");
+        loadTopic(btn.dataset.topic);
+      });
+    });
+
+    document.getElementById("vote-a").addEventListener("click", () => castVote("a"));
+    document.getElementById("vote-b").addEventListener("click", () => castVote("b"));
 
     function castVote(option) {
+      const votesRef = ref(db, `topics/${currentTopic}/votes`);
       runTransaction(votesRef, (currentData) => {
         if (currentData === null) {
           return { a: option === "a" ? 1 : 0, b: option === "b" ? 1 : 0 };
@@ -89,24 +236,17 @@
       });
     }
 
-    document.getElementById("vote-a").addEventListener("click", () => castVote("a"));
-    document.getElementById("vote-b").addEventListener("click", () => castVote("b"));
-
-    onValue(votesRef, (snapshot) => {
-      const data = snapshot.val() || { a: 0, b: 0 };
-      const countA = data.a || 0;
-      const countB = data.b || 0;
-      const total = countA + countB;
-
-      const pctA = total === 0 ? 50 : Math.round((countA / total) * 100);
-      const pctB = total === 0 ? 50 : 100 - pctA;
-
-      document.getElementById("bar-a").style.width = pctA + "%";
-      document.getElementById("bar-b").style.width = pctB + "%";
-      document.getElementById("text-a").innerText = `탄산 포기: ${countA}표 (${pctA}%)`;
-      document.getElementById("text-b").innerText = `라면 포기: ${countB}표 (${pctB}%)`;
-      document.getElementById("total-text").innerText = `총 ${total}명 실시간 참여 중`;
+    document.getElementById("comment-form").addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const input = document.getElementById("comment-input");
+      const text = input.value.trim();
+      if (!text) return;
+      const commentsRef = ref(db, `topics/${currentTopic}/comments`);
+      await push(commentsRef, { text, time: serverTimestamp() });
+      input.value = "";
     });
+
+    loadTopic("q1");
   </script>
 </body>
 </html>
